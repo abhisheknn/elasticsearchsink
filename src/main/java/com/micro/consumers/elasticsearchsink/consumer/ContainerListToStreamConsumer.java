@@ -2,6 +2,9 @@ package com.micro.consumers.elasticsearchsink.consumer;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +38,11 @@ public class ContainerListToStreamConsumer extends ConsumerThread {
 			for (ConsumerRecord<String, String> record : records) {
 				Map<String, Object> map = gson.fromJson(record.value(), mapType);
 				map.put(Constants.DOCKERHOST, record.key());
-				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINER_INDEX,Constants.DOCKERX_CONTAINER).source(map);
+				//LocalDateTime datetime = LocalDateTime.parse(new Date(record.timestamp()).toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
+				map.put(Constants.TIMESTAMP,new Date(record.timestamp()));
+				map.put("dummy", "a:b");
+			
+				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINER_INDEX,Constants.DOCKERX_CONTAINER).id(record.key()).source(map);
 				try {
 					IndexResponse indexResponse = client.getClient().index(indexRequest, RequestOptions.DEFAULT);
 					System.out.println(indexResponse.getId());

@@ -2,6 +2,7 @@ package com.micro.consumers.elasticsearchsink.consumer;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,11 @@ public class ContainerIdToImageIdConsumer extends ConsumerThread {
 		while (true) {
 			ConsumerRecords<String, String> records = consumer.poll(100);
 			for (ConsumerRecord<String, String> record : records) {
-				Map<String, String> map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put(Constants.DOCKERHOST, record.key());
 				map.put(Constants.IMAGEID, record.value());
-				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINERID_TO_IMAGEID_INDEX,Constants.DOCKERX_CONTAINERID_TO_IMAGEID).source(map);
+				map.put(Constants.TIMESTAMP,new Date(record.timestamp()));
+				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINERID_TO_IMAGEID_INDEX,Constants.DOCKERX_CONTAINERID_TO_IMAGEID).id(record.key()).source(map);
 				try {
 					IndexResponse indexResponse = client.getClient().index(indexRequest, RequestOptions.DEFAULT);
 					System.out.println(indexResponse.getId());

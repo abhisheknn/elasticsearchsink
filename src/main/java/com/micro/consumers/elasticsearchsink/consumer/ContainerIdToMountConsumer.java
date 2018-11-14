@@ -2,6 +2,7 @@ package com.micro.consumers.elasticsearchsink.consumer;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +35,9 @@ public class ContainerIdToMountConsumer extends ConsumerThread {
 			ConsumerRecords<String, String> records = consumer.poll(100);
 			for (ConsumerRecord<String, String> record : records) {
 				Map<String, Object> map = gson.fromJson(record.value(), mapType);
-				map.put("dockerhost", record.key());
-				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINERID_TO_MOUNT_INDEX,Constants.DOCKERX_CONTAINERID_TO_MOUNT).source(map);
+				map.put(Constants.DOCKERHOST, record.key());
+				map.put(Constants.TIMESTAMP,new Date(record.timestamp()));
+				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINERID_TO_MOUNT_INDEX,Constants.DOCKERX_CONTAINERID_TO_MOUNT).id(record.key()).source(map);
 				try {
 					IndexResponse indexResponse = client.getClient().index(indexRequest, RequestOptions.DEFAULT);
 					System.out.println(indexResponse.getId());

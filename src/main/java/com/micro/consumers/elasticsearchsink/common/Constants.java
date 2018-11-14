@@ -29,6 +29,7 @@ public class Constants {
 	public static final String DOCKERX_CONTAINERID_TO_MOUNT = "mount";
 	public static final String DOCKERHOST = "dockerhost";
 	public static final String IMAGEID = "imageid";
+	public static final String TIMESTAMP = "timestamp";
 	
 	
 
