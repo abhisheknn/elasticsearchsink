@@ -21,15 +21,21 @@ public class Constants {
 	public static final String DOCKERX_CONTAINER_INDEX = "dockerx_container";
 	public static final String DOCKERX_CONTAINERID_TO_IMAGEID_INDEX = "dockerx_containerid_to_imageid";
 	public static final String DOCKERX_CONTAINERID_TO_MOUNT_INDEX = "dockerx_containerid_to_mount";
+	public static final String DOCKERX_DELETED_CONTAINERS_INDEX = "dockerx_deleted_containers";
 	
 	//Elasticsearch Type
 	
-	public static final String DOCKERX_CONTAINER = "container";
-	public static final String DOCKERX_CONTAINERID_TO_IMAGEID = "image";
-	public static final String DOCKERX_CONTAINERID_TO_MOUNT = "mount";
+	public static final String TYPE="_doc";
+	
+//	public static final String DOCKERX_CONTAINER = "container";
+//	public static final String DOCKERX_CONTAINERID_TO_IMAGEID = "image";
+//	public static final String DOCKERX_CONTAINERID_TO_MOUNT = "mount";
 	public static final String DOCKERHOST = "dockerhost";
 	public static final String IMAGEID = "imageid";
 	public static final String TIMESTAMP = "timestamp";
+	public static final String CONTAINERID = "CONTAINERID";
+	public static final String DELETED_CONTAINERIDS_GROUPID = "deleted_containerid_list";
+	public static final String DELETED_CONTAINERIDS_TOPICS = "deleted_containerid_list";
 	
 	
 

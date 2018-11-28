@@ -15,6 +15,7 @@ import com.micro.consumers.elasticsearchsink.consumer.ContainerIdToMountConsumer
 //import com.micro.consumers.elasticsearchsink.consumer.ContainerIdToImageIdConsumer;
 //import com.micro.consumers.elasticsearchsink.consumer.ContainerIdToMountConsumer;
 import com.micro.consumers.elasticsearchsink.consumer.ContainerListToStreamConsumer;
+import com.micro.consumers.elasticsearchsink.consumer.DeletedContainerIdConsumer;
 
 
 
@@ -30,6 +31,7 @@ public class ElasticSearchSink {
 		spwanContainerListToStreamConsumer();
 		spwanContainerIdToImageIdConsumer();
 		spwanContainerIdToMountConsumer();
+		spwanDeletedContainerIdConsumer();
 	}
 
 	private static void spwanContainerListToStreamConsumer() {
@@ -49,6 +51,14 @@ public class ElasticSearchSink {
 	private static void spwanContainerIdToMountConsumer() {
 		ElasticSearchClient client= new ElasticSearchClient(); 
 		ConsumerThread ncThread=     new ContainerIdToMountConsumer(client,Constants.KAFKABROKER, Constants.CONTAINER_TO_MOUNT_CONSUMER_GROUP_ID, Constants.CONTAINER_TO_MOUNTS_TOPIC);
+		ConsumerGroup consumerGroup= new ConsumerGroup(ncThread, 1);
+		consumerGroup.execute();
+	}
+	
+	
+	private static void spwanDeletedContainerIdConsumer() {
+		ElasticSearchClient client= new ElasticSearchClient(); 
+		ConsumerThread ncThread=     new DeletedContainerIdConsumer(client,Constants.KAFKABROKER, Constants.DELETED_CONTAINERIDS_GROUPID, Constants.DELETED_CONTAINERIDS_TOPICS);
 		ConsumerGroup consumerGroup= new ConsumerGroup(ncThread, 1);
 		consumerGroup.execute();
 	}

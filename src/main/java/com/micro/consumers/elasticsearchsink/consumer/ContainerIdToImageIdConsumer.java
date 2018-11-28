@@ -39,7 +39,7 @@ public class ContainerIdToImageIdConsumer extends ConsumerThread {
 				map.put(Constants.DOCKERHOST, record.key());
 				map.put(Constants.IMAGEID, record.value());
 				map.put(Constants.TIMESTAMP,new Date(record.timestamp()));
-				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINERID_TO_IMAGEID_INDEX,Constants.DOCKERX_CONTAINERID_TO_IMAGEID).id(record.key()).source(map);
+				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINERID_TO_IMAGEID_INDEX,Constants.TYPE).id(record.key()).source(map);
 				try {
 					IndexResponse indexResponse = client.getClient().index(indexRequest, RequestOptions.DEFAULT);
 					System.out.println(indexResponse.getId());

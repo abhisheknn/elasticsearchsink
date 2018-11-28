@@ -38,11 +38,8 @@ public class ContainerListToStreamConsumer extends ConsumerThread {
 			for (ConsumerRecord<String, String> record : records) {
 				Map<String, Object> map = gson.fromJson(record.value(), mapType);
 				map.put(Constants.DOCKERHOST, record.key());
-				//LocalDateTime datetime = LocalDateTime.parse(new Date(record.timestamp()).toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
 				map.put(Constants.TIMESTAMP,new Date(record.timestamp()));
-				map.put("dummy", "a:b");
-			
-				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINER_INDEX,Constants.DOCKERX_CONTAINER).id(record.key()).source(map);
+				IndexRequest indexRequest = new IndexRequest(Constants.DOCKERX_CONTAINER_INDEX,Constants.TYPE).id(record.key()).source(map);
 				try {
 					IndexResponse indexResponse = client.getClient().index(indexRequest, RequestOptions.DEFAULT);
 					System.out.println(indexResponse.getId());
