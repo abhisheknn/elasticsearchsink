@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -15,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.micro.consumers.elasticsearchsink.common.Constants;
 import com.micro.consumers.elasticsearchsink.connection.ElasticSearchClient;
+import com.micro.kafka.ConsumerThread;
 public class ContainerIdToMountConsumer extends ConsumerThread {
 	private ElasticSearchClient client = null;
 
@@ -24,8 +26,8 @@ public class ContainerIdToMountConsumer extends ConsumerThread {
 	Type listType = new TypeToken<List<Map<String, Object>>>() {
 	}.getType();
 
-	public ContainerIdToMountConsumer(ElasticSearchClient client, String brokers, String groupId, String topic) {
-		super(brokers, groupId, topic);
+	public ContainerIdToMountConsumer(ElasticSearchClient client,Properties config, String topic) {
+		super(config, topic);
 		this.client = client;
 	}
 
