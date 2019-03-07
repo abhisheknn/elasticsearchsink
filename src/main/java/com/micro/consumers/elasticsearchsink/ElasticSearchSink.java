@@ -20,65 +20,51 @@ import com.micro.consumers.elasticsearchsink.consumer.DeletedContainerIdConsumer
 import com.micro.kafka.ConsumerGroup;
 import com.micro.kafka.ConsumerThread;
 
-
-
-
 @SpringBootApplication
-@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = { MongoAutoConfiguration.class })
 public class ElasticSearchSink {
 
-
-	
 	public static void main(String[] args) {
 		SpringApplication.run(ElasticSearchSink.class, args);
-		spwanContainerListToStreamConsumer();
-		spwanContainerIdToImageIdConsumer();
-		spwanContainerIdToMountConsumer();
-		spwanDeletedContainerIdConsumer();
+		 spwanContainerListToStreamConsumer();
+		 spwanContainerIdToImageIdConsumer();
+		 spwanContainerIdToMountConsumer();
+		 spwanDeletedContainerIdConsumer();
 	}
 
 	private static void spwanContainerListToStreamConsumer() {
-		ElasticSearchClient client =new ElasticSearchClient(); 
-		Properties properties= new Properties();
+		ElasticSearchClient client = new ElasticSearchClient();
+		Properties properties = new Properties();
 		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKABROKER);
 		properties.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.CONTAINER_LIST_TO_STREAM_CONSUMER_GROUP_ID);
-		
-		ConsumerThread ncThread=     new ContainerListToStreamConsumer(client,properties, Constants.CONTAINER_LIST_TO_STREAM);
-		ConsumerGroup consumerGroup= new ConsumerGroup(ncThread, 1);
-		consumerGroup.execute();
+
+		new ContainerListToStreamConsumer(client, properties, Constants.CONTAINER_LIST_TO_STREAM);
+
 	}
-	
+
 	private static void spwanContainerIdToImageIdConsumer() {
-		ElasticSearchClient client= new ElasticSearchClient(); 
-		Properties properties= new Properties();
-		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,Constants.KAFKABROKER);
+		ElasticSearchClient client = new ElasticSearchClient();
+		Properties properties = new Properties();
+		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKABROKER);
 		properties.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.CONTAINERID_TO_IMAGEID_CONSUMER_GROUP_ID);
-		
-		ConsumerThread ncThread=     new ContainerIdToImageIdConsumer(client,properties, Constants.CONTAINERID_TO_IMAGEID_TOPIC);
-		ConsumerGroup consumerGroup= new ConsumerGroup(ncThread, 1);
-		consumerGroup.execute();
+		new ContainerIdToImageIdConsumer(client, properties, Constants.CONTAINERID_TO_IMAGEID_TOPIC);
 	}
-	
+
 	private static void spwanContainerIdToMountConsumer() {
-		ElasticSearchClient client= new ElasticSearchClient(); 
-		Properties properties= new Properties();
-		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,Constants.KAFKABROKER);
+		ElasticSearchClient client = new ElasticSearchClient();
+		Properties properties = new Properties();
+		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKABROKER);
 		properties.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.CONTAINER_TO_MOUNT_CONSUMER_GROUP_ID);
-		
-		ConsumerThread ncThread=     new ContainerIdToMountConsumer(client,properties, Constants.CONTAINER_TO_MOUNTS_TOPIC);
-		ConsumerGroup consumerGroup= new ConsumerGroup(ncThread, 1);
-		consumerGroup.execute();
+		new ContainerIdToMountConsumer(client, properties, Constants.CONTAINER_TO_MOUNTS_TOPIC);
+
 	}
-	
-	
+
 	private static void spwanDeletedContainerIdConsumer() {
-		ElasticSearchClient client= new ElasticSearchClient(); 
-		Properties properties= new Properties();
-		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,Constants.KAFKABROKER);
+		ElasticSearchClient client = new ElasticSearchClient();
+		Properties properties = new Properties();
+		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKABROKER);
 		properties.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.DELETED_CONTAINERIDS_GROUPID);
-		
-		ConsumerThread ncThread=     new DeletedContainerIdConsumer(client,properties, Constants.DELETED_CONTAINERIDS_TOPICS);
-		ConsumerGroup consumerGroup= new ConsumerGroup(ncThread, 1);
-		consumerGroup.execute();
+		new DeletedContainerIdConsumer(client, properties, Constants.DELETED_CONTAINERIDS_TOPICS);
+
 	}
 }

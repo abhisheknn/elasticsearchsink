@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.elasticsearch.ElasticsearchStatusException;
@@ -29,10 +30,11 @@ import com.google.gson.reflect.TypeToken;
 import com.micro.consumers.elasticsearchsink.common.Constants;
 import com.micro.consumers.elasticsearchsink.connection.ElasticSearchClient;
 import com.micro.kafka.ConsumerThread;
+import com.micro.kafka.KafkaConsumer;
 
-public class DeletedContainerIdConsumer extends ConsumerThread {
+public class DeletedContainerIdConsumer{
 	private ElasticSearchClient client = null;
-
+	private Consumer consumer;
 	private Gson gson = new Gson();
 	Type mapType = new TypeToken<Map<String, Object>>() {
 	}.getType();
@@ -40,15 +42,26 @@ public class DeletedContainerIdConsumer extends ConsumerThread {
 	}.getType();
 
 	public DeletedContainerIdConsumer(ElasticSearchClient client, Properties config, String topic) {
-		super(config, topic);
 		this.client = client;
+		KafkaConsumer
+		.build()
+		.withConfig(config)
+		.withTopic(topic)
+		.withProcessor(()->{
+			if(consumer==null)consumer=KafkaConsumer.builder.getConsumer();
+			return execute(client);
+			})
+		.consume();
+
 	}
 
-	@Override
-	public void run() {
-		while (true) {
-			ConsumerRecords<String, String> records = consumer.poll(100);
+	private boolean execute(ElasticSearchClient client) {
+		ConsumerRecords<String, String> records;
+		synchronized (consumer) {
+				 records = consumer.poll(100);	
+			}
 			for (ConsumerRecord<String, String> record : records) {
+				try {
 				Map<String,Object> map=	gson.fromJson(record.value(), mapType);
 				List<String> deletedContainersIds=(List<String>)map.get("value");
 				for(String deletedContainerId:deletedContainersIds) {
@@ -59,13 +72,16 @@ public class DeletedContainerIdConsumer extends ConsumerThread {
 				}
 				System.out.println("Receive message: " + record.value() + ", Partition: " + record.partition()
 						+ ", Offset: " + record.offset() + ", by ThreadID: " + Thread.currentThread().getId());
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
+			
+			}
+			return true;
 		}
 
-	}
-
-	private void addToDeletedContainersIndex(ConsumerRecord<String, String> record, String deletedContainerId) {
-		try {
+	private void addToDeletedContainersIndex(ConsumerRecord<String, String> record, String deletedContainerId) throws IOException {
+		
 		GetRequest getRequest = new GetRequest(Constants.DOCKERX_CONTAINER_INDEX, Constants.TYPE,
 				record.key() + "_" + deletedContainerId);
 		GetResponse getResponse = client.getClient().get(getRequest, RequestOptions.DEFAULT); 
@@ -75,42 +91,30 @@ public class DeletedContainerIdConsumer extends ConsumerThread {
 				Constants.TYPE).id(record.key() + "_" + deletedContainerId).source(source);
 		IndexResponse indexResponse = client.getClient().index(indexRequest, RequestOptions.DEFAULT);
 		}
-		}
-		catch(Exception e) {
-			System.out.println(e);  //todo
-		}
+		
 	}
 
-	private void deleteFromContainersIndex(ConsumerRecord<String, String> record, String deletedContainerId) {
-		try {
+	private void deleteFromContainersIndex(ConsumerRecord<String, String> record, String deletedContainerId) throws IOException {
+		
 DeleteRequest requestForContainers = new DeleteRequest(Constants.DOCKERX_CONTAINER_INDEX,Constants.TYPE,record.key()+"_" + deletedContainerId);
 DeleteResponse deleteResponseForContainers = client.getClient().delete(
 			requestForContainers, RequestOptions.DEFAULT);
-		}catch(Exception e) {
-			System.out.println(e); //todo
-		}
 	}
 
-	private void deleteFromContainerIdToImageIdIndex(ConsumerRecord<String, String> record, String deletedContainerId) {
-		try {
+	private void deleteFromContainerIdToImageIdIndex(ConsumerRecord<String, String> record, String deletedContainerId) throws IOException {
+		
 DeleteRequest requestForMounts = new DeleteRequest(Constants.DOCKERX_CONTAINERID_TO_IMAGEID_INDEX,Constants.TYPE,record.key()+"_" + deletedContainerId);
 DeleteResponse deleteResponseForMounts = client.getClient().delete(
 			requestForMounts, RequestOptions.DEFAULT);
-		}catch (Exception e) {
-			System.out.println(e);
-		}
+		
 	}
 
-	private void deleteFromContaineridToMountIndex(ConsumerRecord<String, String> record, String deletedContainerId) {
-		try {
+	private void deleteFromContaineridToMountIndex(ConsumerRecord<String, String> record, String deletedContainerId) throws IOException {
 		DeleteByQueryRequest request = new DeleteByQueryRequest(Constants.DOCKERX_CONTAINERID_TO_MOUNT_INDEX);
 		request.setQuery(new TermQueryBuilder(Constants.CONTAINERID, record.key() + "_" + deletedContainerId));
 		
 			BulkByScrollResponse bulkResponse = client.getClient().deleteByQuery(request,
 					RequestOptions.DEFAULT);
-		}catch(Exception e) {
-			System.out.println(e); //todo
-		}
 	}
 
 }
