@@ -19,20 +19,20 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.micro.consumers.elasticsearchsink.common.Constants;
 import com.micro.consumers.elasticsearchsink.connection.ElasticSearchClient;
-import com.micro.kafka.ConsumerThread;
 import com.micro.kafka.KafkaConsumer;
 public class ContainerIdToImageIdConsumer{
 	private ElasticSearchClient client = null;
 	private Consumer consumer;
+	KafkaConsumer kafkaConsumer= new KafkaConsumer();
 	public ContainerIdToImageIdConsumer(ElasticSearchClient client,Properties config, String topic) {
 		this.client = client;
-		KafkaConsumer
+		
+		kafkaConsumer
 		.build()
 		.withConfig(config)
 		.withTopic(topic)
 		.withProcessor(()->{
-			if(consumer==null)consumer=KafkaConsumer.builder.getConsumer();
-			return execute(client);
+			this.execute(client);
 			})
 		.consume();
 
@@ -40,9 +40,7 @@ public class ContainerIdToImageIdConsumer{
 
 	private boolean execute(ElasticSearchClient client) {
 		ConsumerRecords<String, String> records;
-		synchronized (consumer) {
-				 records = consumer.poll(100);	
-			}
+				 records = kafkaConsumer.builder.getConsumer().poll(100);	
 		for (ConsumerRecord<String, String> record : records) {
 			Map<String, Object> map = new HashMap<>();
 			map.put(Constants.DOCKERHOST, record.key());

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.elasticsearch.action.index.IndexRequest;
@@ -17,26 +16,25 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.micro.consumers.elasticsearchsink.common.Constants;
 import com.micro.consumers.elasticsearchsink.connection.ElasticSearchClient;
-import com.micro.kafka.ConsumerThread;
 import com.micro.kafka.KafkaConsumer;
-public class ContainerIdToMountConsumer extends ConsumerThread {
+public class ContainerIdToMountConsumer {
 	private ElasticSearchClient client = null;
-	private Consumer consumer;
 	private Gson gson = new Gson();
-	Type mapType = new TypeToken<Map<String, Object>>() {
+	private Type mapType = new TypeToken<Map<String, Object>>() {
 	}.getType();
-	Type listType = new TypeToken<List<Map<String, Object>>>() {
+	private Type listType = new TypeToken<List<Map<String, Object>>>() {
 	}.getType();
-
+	
+	private KafkaConsumer kafkaConsumer= new KafkaConsumer();
+	
 	public ContainerIdToMountConsumer(ElasticSearchClient client,Properties config, String topic) {
 		this.client = client;
-		KafkaConsumer
+		kafkaConsumer
 		.build()
 		.withConfig(config)
 		.withTopic(topic)
 		.withProcessor(()->{
-			if(consumer==null)consumer=KafkaConsumer.builder.getConsumer();
-			return execute(client);
+			this.execute(client);
 			})
 		.consume();
 
@@ -47,10 +45,8 @@ public class ContainerIdToMountConsumer extends ConsumerThread {
 
 	private boolean execute(ElasticSearchClient client) {
 		
-		ConsumerRecords<String, String> records;
-		synchronized (consumer) {
-				 records = consumer.poll(100);	
-			}
+		ConsumerRecords<String, String> records  = kafkaConsumer.builder.getConsumer().poll(100);	
+			
 			for (ConsumerRecord<String, String> record : records) {
 				try {
 					Map<String, Object> map = gson.fromJson(record.value(), mapType);
