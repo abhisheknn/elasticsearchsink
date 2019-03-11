@@ -2,10 +2,10 @@ package com.micro.consumers.elasticsearchsink.common;
 
 public class Constants {
 
-	public static final String CONTAINER_DETAILS_TOPIC = "container_details";
-	public static final String CONTAINER_LIST_TO_STREAM = "container_list_to_stream";
-	public static final String CONTAINERID_TO_IMAGEID_TOPIC = "containerid_to_imageid";
-	public static final String CONTAINER_TO_MOUNTS_TOPIC = "container_to_mount";
+	public static final String CONTAINER_DETAILS_TOPIC = "dockerx.container_details";
+	public static final String CONTAINER_LIST_TO_STREAM = "dockerx.container_list_to_stream";
+	public static final String CONTAINERID_TO_IMAGEID_TOPIC = "dockerx.containerid_to_imageid";
+	public static final String CONTAINER_TO_MOUNTS_TOPIC = "dockerx.container_to_mount";
 	public static final String CONTAINER_DETAILS_CONSUMER_GROUP_ID = "container_details_consumer";
 	public static final String CONTAINERID_TO_IMAGEID_CONSUMER_GROUP_ID = "container_to_image_id_consumer";
 	public static final String CONTAINER_TO_MOUNT_CONSUMER_GROUP_ID = "container_to_mount_id_consumer";
@@ -35,7 +35,7 @@ public class Constants {
 	public static final String TIMESTAMP = "timestamp";
 	public static final String CONTAINERID = "CONTAINERID";
 	public static final String DELETED_CONTAINERIDS_GROUPID = "deleted_containerid_list";
-	public static final String DELETED_CONTAINERIDS_TOPICS = "deleted_containerid_list";
+	public static final String DELETED_CONTAINERIDS_TOPICS = "dockerx.deleted_containerid_list";
 	
 	
 

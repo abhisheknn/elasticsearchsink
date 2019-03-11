@@ -3,7 +3,6 @@ package com.micro.consumers.elasticsearchsink;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,8 +16,6 @@ import com.micro.consumers.elasticsearchsink.consumer.ContainerIdToMountConsumer
 //import com.micro.consumers.elasticsearchsink.consumer.ContainerIdToMountConsumer;
 import com.micro.consumers.elasticsearchsink.consumer.ContainerListToStreamConsumer;
 import com.micro.consumers.elasticsearchsink.consumer.DeletedContainerIdConsumer;
-import com.micro.kafka.ConsumerGroup;
-import com.micro.kafka.ConsumerThread;
 
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = { MongoAutoConfiguration.class })
